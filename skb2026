@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Catatan Harian Ramadhan 2026</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>📔 Catatan Harian Ramadhan 2026</h2>
+
+<form id="formRamadhan">
+  <input type="text" id="nama" placeholder="Nama Siswa" required>
+  <input type="text" id="kelas" placeholder="Kelas" required>
+  <input type="date" id="tanggal" required>
+
+  <textarea id="catatan" placeholder="Kegiatan Ramadhan hari ini" required></textarea>
+
+  <input type="file" id="foto" accept="image/*" required>
+
+  <button type="submit">📤 Kirim</button>
+</form>
+
+<p id="status"></p>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Guru Ramadhan 2026</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>📊 Catatan Harian Siswa</h2>
+
+<div id="laporan"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="app.js"></script>
+
+<script>
+  tampilkanDataGuru();
+</script>
+
+</body>
+</html>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+}
+
+form, .card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 400px;
+  margin-bottom: 15px;
+}
+
+input, textarea, button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+}
+
+button {
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.card img {
+  margin-top: 8px;
+  max-width: 100%;
+}
+// 🔥 GANTI DENGAN CONFIG FIREBASE ANDA
+const firebaseConfig = {
+  apiKey: "ISI_API_KEY",
+  authDomain: "PROJECT.firebaseapp.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT.appspot.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// === FORM SISWA ===
+const form = document.getElementById("formRamadhan");
+if (form) {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const fotoFile = foto.files[0];
+    const ref = storage.ref("ramadhan2026/" + Date.now() + "_" + fotoFile.name);
+    await ref.put(fotoFile);
+    const fotoURL = await ref.getDownloadURL();
+
+    await db.collection("ramadhan2026").add({
+      nama: nama.value,
+      kelas: kelas.value,
+      tanggal: tanggal.value,
+      catatan: catatan.value,
+      fotoURL: fotoURL,
+      waktu: new Date()
+    });
+
+    status.innerText = "✅ Catatan berhasil dikirim";
+    form.reset();
+  });
+}
+
+// === HALAMAN GURU ===
+function tampilkanDataGuru() {
+  const laporan = document.getElementById("laporan");
+
+  db.collection("ramadhan2026")
+    .orderBy("waktu", "desc")
+    .onSnapshot(snapshot => {
+      laporan.innerHTML = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        laporan.innerHTML += `
+          <div class="card">
+            <b>${d.nama}</b> (${d.kelas})<br>
+            📅 ${d.tanggal}<br>
+            ${d.catatan}<br>
+            <img src="${d.fotoURL}">
+          </div>
+        `;
+      });
+    });
+}
