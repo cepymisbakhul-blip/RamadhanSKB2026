@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+content="default-src 'self';
+img-src data: https://*.github.io https://firebasestorage.googleapis.com;">
+
   <title>Catatan Harian Ramadhan 2026</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -33,7 +36,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+ <meta http-equiv="Content-Security-Policy"
+content="default-src 'self';
+img-src data: https://*.github.io https://firebasestorage.googleapis.com;">
+
   <title>Dashboard Guru Ramadhan 2026</title>
   <link rel="stylesheet" href="style.css">
 </head>
